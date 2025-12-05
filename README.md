@@ -80,7 +80,8 @@ This section details how to set up and run the necessary Large Language Model (L
    
    python server_mcp.py
 
-4. To try the code from clientLangChain.py just execute:
+## 3. Trying out
+   To try the code from clientLangChain.py just execute:
 
 
    Bash
