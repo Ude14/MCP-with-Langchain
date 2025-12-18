@@ -70,7 +70,7 @@ This section details how to set up and run the necessary Large Language Model (L
   Bash
 
   
-  fastmcp run server_mcp.py:mcp --port 8000 --transport sse
+   fastmcp run server_mcp_lang.py:mcp --port 9001 --transport streamable-http
 
    -Another possibility is to run directly:
 
@@ -96,8 +96,7 @@ This section details how to set up and run the necessary Large Language Model (L
 
    Bash
    
-   fastmcp run server_mcp_lang.py:mcp --port 9001 --transport streamable-http
-
+   uvicorn main_server:app --reload
 
    With our server running we can to petitions with:
 
