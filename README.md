@@ -87,6 +87,21 @@ This section details how to set up and run the necessary Large Language Model (L
    Bash
 
    python clientLangChain.py
+
+
+   # If what you want is to have your agent as a server to recibe questions:
+   We need to have running beforehand the ollama server, the MCP server and then:
+
+
+
+   Bash
    
+   fastmcp run server_mcp_lang.py:mcp --port 9001 --transport streamable-http
+
+
+   With our server running we can to petitions with:
+
+   curl -X POST -H "Content-Type: application/json" -d "{\"user_prompt\": \"Give me the author of the book The Lord of the Rings\"}" http://127.0.0.1:8000/answerer/
+
    
 
