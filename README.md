@@ -1,106 +1,154 @@
-# MCP-with-Langchain
+# MCP with LangChain
 
-This repository contains the necessary code to run an **MCP server**, an **Ollama LLM server**, and to execute petitions to the **LangChain agent** that connects them.
+This repository contains everything you need to run:
+
+- An **MCP Server**
+- An **Ollama LLM Server**
+- A **LangChain agent** that connects to the MCP server and allows you to interact with it.
 
 ---
 
-## 1. Running the Ollama Server
+# 1. Running the Ollama Server
 
-This section details how to set up and run the necessary Large Language Model (LLM) using Ollama.
+First, install **Ollama** from the official website:
 
-1. Install **Ollama** from the official download page:
+https://ollama.com/download/windows
 
-   
-   [https://ollama.com/download/windows](https://ollama.com/download/windows)
-2. **Before installing the LLM**, configure the host to listen on all interfaces. This is crucial for external connections:
+## Configure Ollama
 
+Before installing or running any model, configure Ollama to listen on all network interfaces. This is required if external applications need to connect to it.
 
-   Bash
+```bash
+set OLLAMA_HOST=0.0.0.0:11434
+```
 
-   
-   set OLLAMA_HOST=0.0.0.0:11434
-   
-4. **Once we have done that** we can do:
+## Start the Ollama server
 
-   
-   Bash
+```bash
+ollama serve
+```
 
-   
-   ollama serve
-   
-   Opening a new terminal we are going to install the model, first choose from https://ollama.com/search a model that suits you best, then:
+## Download a model
 
-   
-   Bash
+Open a new terminal and choose a model from:
 
-   
-   ollama pull <model>
-   
-   For example: ollama pull llama3.2:1b, once installed we just run it:
+https://ollama.com/search
 
-   
-   Bash
+Then download it with:
 
-   
-   ollama run llama3.2:1b
-   
-   If you are having trouble with the run you can see if the model was installed with "ollama list" where you should see the name of the model, the size...
-   When we do ollama run llama3.2:1b we can ask the LLM whatever we want to see if it works, then exit with /bye.
-   Finally, to run it so we can use it in our system just do:
+```bash
+ollama pull <model>
+```
 
-   
-   Bash
+For example:
 
-   
-   ollama serve
+```bash
+ollama pull llama3.2:1b
+```
 
-## 2. Running the MCP Server
-   1. **First**, install FastMCP:
+## Test the model
 
+Run the downloaded model:
 
-   Bash
+```bash
+ollama run llama3.2:1b
+```
 
-   
-   pip install fastmcp
+You can ask the model any question to verify that everything works correctly. Exit the interactive session with:
 
-   2. **Now**, it is ready to use once we write the code. Then you can see if it works with:
-   -This one runs the server in the port especified
+```text
+/bye
+```
 
+If the model cannot be found, verify that it was installed successfully:
 
-  Bash
+```bash
+ollama list
+```
 
-  
-   fastmcp run server_mcp_lang.py:mcp --port 9001 --transport streamable-http
+The command should display the installed models along with their sizes and other information.
 
-   -Another possibility is to run directly:
+Finally, make sure the Ollama server is running before using the rest of the project:
 
-   
-   Bash
+```bash
+ollama serve
+```
 
-   
-   python server_mcp.py
+---
 
-## 3. Trying out
-   To try the code from clientLangChain.py just execute:
+# 2. Running the MCP Server
 
+## Install FastMCP
 
-   Bash
+```bash
+pip install fastmcp
+```
 
-   python clientLangChain.py
+## Run the server
 
+You can start the MCP server using FastMCP:
 
-   # If what you want is to have your agent as a server to recibe questions:
-   We need to have running beforehand the ollama server, the MCP server and then:
+```bash
+fastmcp run server_mcp_lang.py:mcp --port 9001 --transport streamable-http
+```
 
+Alternatively, you can run it directly with Python:
 
+```bash
+python server_mcp.py
+```
 
-   Bash
-   
-   uvicorn main_server:app --reload
+---
 
-   With our server running we can to petitions with:
+# 3. Running the LangChain Client
 
-   curl -X POST -H "Content-Type: application/json" -d "{\"user_prompt\": \"Give me the author of the book The Lord of the Rings\"}" http://127.0.0.1:8000/answerer/
+To test the MCP server using the provided LangChain client, simply run:
 
-   
+```bash
+python clientLangChain.py
+```
 
+---
+
+# 4. Running the Agent as an API Server
+
+If you want to expose the LangChain agent through a REST API, make sure the following services are already running:
+
+1. Ollama Server
+2. MCP Server
+
+Then start the API server:
+
+```bash
+uvicorn main_server:app --reload
+```
+
+Once the server is running, you can send requests using `curl`:
+
+```bash
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d "{\"user_prompt\":\"Give me the author of the book The Lord of the Rings\"}" \
+  http://127.0.0.1:8000/answerer/
+```
+
+---
+
+# Project Workflow
+
+The complete execution flow is:
+
+```text
+User
+   │
+   ▼
+LangChain Agent
+   │
+   ▼
+MCP Server
+   │
+   ▼
+Ollama LLM
+```
+
+The LangChain agent receives the user's request, communicates with the MCP server whenever tools are required, and the MCP server uses the Ollama LLM to generate the final response.
